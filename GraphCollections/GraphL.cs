@@ -23,8 +23,21 @@ namespace GraphCollections
 
         public void addEdge(string str1, string str2, int num)
         {
-            FindByValue(str1).Neighbors.Add(str2);
-            FindByValue(str1).dist.Add(new Edge(num));
+            Vertex v1 = FindByValue(str1);
+            Vertex v2 = FindByValue(str2);
+            if (v1 == null)
+            {
+                v1 = new Vertex(str1);
+                nodeSet.Add(v1);
+            }
+            if (v2 == null)
+            {
+                v2 = new Vertex(str2);
+                nodeSet.Add(v2);
+            }
+            v1.Neighbors.Add(str2);
+            v1.dist.Add(new Edge(num));
+
         }
 
         public void addVertex(string str)
@@ -34,7 +47,21 @@ namespace GraphCollections
 
         public int delEdge(string str1, string str2)
         {
-            throw new NotImplementedException();
+            Vertex v1 = FindByValue(str1);
+            Vertex v2 = FindByValue(str2);
+
+            if (v1 == null && v2 == null)
+                throw new KeyNotFoundException();
+
+
+            int index = v1.Neighbors.IndexOf(v2.data);
+            int res = v1.dist[index].dist;
+
+            v1.Neighbors.RemoveAt(index);
+            v1.dist.RemoveAt(index);
+            v2.Neighbors.Remove(str1);
+
+            return res;
         }
 
         private Vertex FindByValue(string str)
@@ -42,7 +69,7 @@ namespace GraphCollections
             Vertex res = null;
             foreach(Vertex v in nodeSet)
             {
-                if(v.data == str)
+                if(v.data.Equals(str))
                 {
                     res = v;
                 }
@@ -76,24 +103,41 @@ namespace GraphCollections
 
         public int getEdge(string str1, string str2)
         {
-            throw new NotImplementedException();
+            Vertex v1 = FindByValue(str1);
+            Vertex v2 = FindByValue(str2);
+
+            if (v1 == null && v2 == null)
+                throw new KeyNotFoundException();
+
+            int index = v1.Neighbors.IndexOf(v2.data);
+            int res = v1.dist[index].dist;
+            
+            return res;
+
         }
 
         public void print()
         {
             foreach(Vertex v in nodeSet)
             {
-                Console.WriteLine(v.data);
-                foreach (Edge e in v.dist)
+                foreach (String n in v.Neighbors)
                 {
-                    Console.WriteLine(e.dist);
+                    Console.WriteLine(v.data + " -> " + n + " = " + getEdge(v.data, n));
                 }
             }
         }
 
         public void setEdge(string str1, string str2, int num)
         {
-            throw new NotImplementedException();
+            Vertex v1 = FindByValue(str1);
+            Vertex v2 = FindByValue(str2);
+
+            if (v1 == null && v2 == null)
+                throw new KeyNotFoundException();
+
+            int index = v1.Neighbors.IndexOf(v2.data);
+            v1.dist[index].dist = num;
+            
         }
 
         public IEnumerator GetEnumerator()

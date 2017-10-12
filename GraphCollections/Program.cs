@@ -21,6 +21,10 @@ namespace GraphCollections
             graph.addEdge("QWERTY", "123456", 42);
 
             graph.print();
+
+            graph.delEdge("qwerty", "QWERTY");
+
+            graph.print();
         }
     }
 }
