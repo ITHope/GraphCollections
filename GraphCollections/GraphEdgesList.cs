@@ -9,16 +9,17 @@ namespace GraphCollections
 {
     class GraphEdgesList : IGraph, IEnumerable
     {
-        List<EdgeList> edgesSet1;
-        public Dictionary<Edge, List<Vertex>> edgesSet { get; set; }
+        //public Dictionary<Edge, List<Vertex>> edgesSet { get; set; }
+
+        List<EdgeList> edgesSet;
         public List<Vertex> nodeSet { get; set; }
 
         public GraphEdgesList() : this(null) { }
 
-        public GraphEdgesList(Dictionary<Edge, List<Vertex>> edgesSet)
+        public GraphEdgesList(List<EdgeList> edgesSet)
         {
             if (edgesSet == null)
-                this.edgesSet = new Dictionary<Edge, List<Vertex>>();
+                this.edgesSet = new List<EdgeList>();
             else
                 this.edgesSet = edgesSet;
         }
@@ -43,7 +44,7 @@ namespace GraphCollections
 
             list.Add(v1);
             list.Add(v2);
-            edgesSet.Add(newEdge, list);
+            edgesSet.Add(new EdgeList(num, v1, v2));
 
             v1.Neighbors.Add(str2);
             v1.dist.Add(new Edge(num));
@@ -62,14 +63,22 @@ namespace GraphCollections
 
             if (v1 == null && v2 == null)
                 throw new KeyNotFoundException();
-
-
+            
             int index = v1.Neighbors.IndexOf(v2.data);
             int res = v1.dist[index].dist;
+
+            var list = edgesSet.FindAll((x) => ( (x.from.data == str1) &&  (x.to.data == str2)));
+
+            foreach(EdgeList e in list)
+            {
+                edgesSet.Remove(e);
+            }
 
             v1.Neighbors.RemoveAt(index);
             v1.dist.RemoveAt(index);
             v2.Neighbors.Remove(str1);
+
+            
 
             return res;
         }
