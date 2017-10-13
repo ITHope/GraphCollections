@@ -43,11 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Edge.cs" />
+    <Compile Include="EdgeList.cs" />
+    <Compile Include="GraphEdges.cs" />
     <Compile Include="GraphL.cs" />
     <Compile Include="IGraph.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vertex.cs" />
+    <Compile Include="VertexList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

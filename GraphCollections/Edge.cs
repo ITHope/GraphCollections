@@ -9,6 +9,7 @@ namespace GraphCollections
     public class Edge
     {
         public int dist = 0;
+        
         public Edge()
         {
             dist = 0;

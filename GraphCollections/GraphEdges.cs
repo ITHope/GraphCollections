@@ -7,24 +7,28 @@ using System.Threading.Tasks;
 
 namespace GraphCollections
 {
-    public class GraphL : IGraph, IEnumerable
+    class GraphEdges : IGraph, IEnumerable
     {
+        public Dictionary<Edge, List<Vertex>> edgesSet { get; set; }
         public List<Vertex> nodeSet { get; set; }
 
-        public GraphL() : this(null) { }
+        public GraphEdges() : this(null) { }
 
-        public GraphL(List<Vertex> nodeSet)
+        public GraphEdges(Dictionary<Edge, List<Vertex>> edgesSet)
         {
-            if (nodeSet == null)
-                this.nodeSet = new List<Vertex>();
+            if (edgesSet == null)
+                this.edgesSet = new Dictionary<Edge, List<Vertex>>();
             else
-                this.nodeSet = nodeSet;
+                this.edgesSet = edgesSet;
         }
 
         public void addEdge(string str1, string str2, int num)
         {
+            List <Vertex> list = new List<Vertex>();
+            Edge newEdge = new Edge(num);
             Vertex v1 = FindByValue(str1);
             Vertex v2 = FindByValue(str2);
+
             if (v1 == null)
             {
                 v1 = new Vertex(str1);
@@ -35,6 +39,11 @@ namespace GraphCollections
                 v2 = new Vertex(str2);
                 nodeSet.Add(v2);
             }
+
+            list.Add(v1);
+            list.Add(v2);
+            edgesSet.Add(newEdge, list);
+
             v1.Neighbors.Add(str2);
             v1.dist.Add(new Edge(num));
 
@@ -67,9 +76,9 @@ namespace GraphCollections
         private Vertex FindByValue(string str)
         {
             Vertex res = null;
-            foreach(Vertex v in nodeSet)
+            foreach (Vertex v in nodeSet)
             {
-                if(v.data.Equals(str))
+                if (v.data.Equals(str))
                 {
                     res = v;
                 }
@@ -111,14 +120,14 @@ namespace GraphCollections
 
             int index = v1.Neighbors.IndexOf(v2.data);
             int res = v1.dist[index].dist;
-            
+
             return res;
 
         }
 
         public void print()
         {
-            foreach(Vertex v in nodeSet)
+            foreach (Vertex v in nodeSet)
             {
                 foreach (String n in v.Neighbors)
                 {
@@ -137,7 +146,7 @@ namespace GraphCollections
 
             int index = v1.Neighbors.IndexOf(v2.data);
             v1.dist[index].dist = num;
-            
+
         }
 
         public IEnumerator GetEnumerator()

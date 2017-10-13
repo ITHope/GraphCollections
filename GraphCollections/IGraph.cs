@@ -15,5 +15,6 @@ namespace GraphCollections
         void print();
         int getEdge(string str1, string str2);
         void setEdge(string str1, string str2, int num);
+        List<Vertex> nodeSet { get; set; }
     }
 }
