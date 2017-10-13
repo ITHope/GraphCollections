@@ -7,7 +7,7 @@ namespace UnitTestProject
 {
     [TestFixture(typeof(GraphL))]
     //[TestFixture(typeof(GraphMatrix))]
-    //[TestFixture(typeof(GraphEdgeList))]
+    [TestFixture(typeof(GraphEdgeList))]
     public class ListNUnitTests<TGraph> where TGraph : IGraph, new()
     {
         IGraph _graph = new TGraph();
@@ -125,9 +125,84 @@ namespace UnitTestProject
         }
 
         [Test]
-        public void TestSetEdgeEx()
+        public void TestGetInputEdgeCount()
         {
-            Assert.Throws<KeyNotFoundException>(() => _graph.setEdge("6", "7", 1));
+            for (int i = 0; i < 5; i++)
+            {
+                _graph.addVertex(i.ToString());
+            }
+            _graph.addEdge("0", "1", 5);
+            _graph.addEdge("0", "2", 4);
+            _graph.setEdge("0", "1", 6);
+            Assert.AreEqual(2, _graph.GetInputEdgeCount("1"));
+        }
+
+        [Test]
+        public void TestGetInputEdgeCountEx()
+        {
+            Assert.Throws<KeyNotFoundException>(() => _graph.GetInputEdgeCount("6"));
+        }
+
+        [Test]
+        public void TestGetOutputEdgeCount()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                _graph.addVertex(i.ToString());
+            }
+            _graph.addEdge("0", "1", 5);
+            _graph.addEdge("0", "2", 4);
+            _graph.setEdge("0", "1", 6);
+            Assert.AreEqual(3, _graph.GetOutputEdgeCount("0"));
+        }
+
+        [Test]
+        public void TestGetInputEdgeCountEx()
+        {
+            Assert.Throws<KeyNotFoundException>(() => _graph.GetOutputEdgeCount("6"));
+        }
+
+        [Test]
+        public void TestGetInputVertexNames()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                _graph.addVertex(i.ToString());
+            }
+            _graph.addEdge("0", "1", 5);
+            _graph.addEdge("0", "2", 4);
+            _graph.setEdge("0", "1", 6);
+            List<Vertex> list = new List<Vertex>();
+            list.Add("0");
+            Assert.AreEqual(list, _graph.GetInputVertexNames("2"));
+        }
+
+        [Test]
+        public void TestGetInputVertexNamesEx()
+        {
+            Assert.Throws<KeyNotFoundException>(() => _graph.GetInputVertexNames("6"));
+        }
+
+        [Test]
+        public void TestGetOutputVertexNames()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                _graph.addVertex(i.ToString());
+            }
+            _graph.addEdge("0", "1", 5);
+            _graph.addEdge("0", "2", 4);
+            _graph.setEdge("0", "1", 6);
+            List<Vertex> list = new List<Vertex>();
+            list.Add("1");
+            list.Add("2");
+            Assert.AreEqual(list, _graph.GetOutputVertexNames("0"));
+        }
+
+        [Test]
+        public void TestGetOutputVertexNamesEx()
+        {
+            Assert.Throws<KeyNotFoundException>(() => _graph.GetOutputVertexNames("6"));
         }
     }
 }

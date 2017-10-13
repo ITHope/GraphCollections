@@ -10,7 +10,7 @@ namespace GraphCollections
     {
         static void Main(string[] args)
         {
-            IGraph graph = new GraphL();
+            IGraph graph = new GraphVertexList();
 
             graph.addVertex("querty");
             graph.addVertex("QUERTY");

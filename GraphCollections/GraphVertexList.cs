@@ -7,28 +7,24 @@ using System.Threading.Tasks;
 
 namespace GraphCollections
 {
-    class GraphEdges : IGraph, IEnumerable
+    public class GraphVertexList : IGraph, IEnumerable
     {
-        public Dictionary<Edge, List<Vertex>> edgesSet { get; set; }
         public List<Vertex> nodeSet { get; set; }
 
-        public GraphEdges() : this(null) { }
+        public GraphVertexList() : this(null) { }
 
-        public GraphEdges(Dictionary<Edge, List<Vertex>> edgesSet)
+        public GraphVertexList(List<Vertex> nodeSet)
         {
-            if (edgesSet == null)
-                this.edgesSet = new Dictionary<Edge, List<Vertex>>();
+            if (nodeSet == null)
+                this.nodeSet = new List<Vertex>();
             else
-                this.edgesSet = edgesSet;
+                this.nodeSet = nodeSet;
         }
 
         public void addEdge(string str1, string str2, int num)
         {
-            List <Vertex> list = new List<Vertex>();
-            Edge newEdge = new Edge(num);
             Vertex v1 = FindByValue(str1);
             Vertex v2 = FindByValue(str2);
-
             if (v1 == null)
             {
                 v1 = new Vertex(str1);
@@ -39,11 +35,6 @@ namespace GraphCollections
                 v2 = new Vertex(str2);
                 nodeSet.Add(v2);
             }
-
-            list.Add(v1);
-            list.Add(v2);
-            edgesSet.Add(newEdge, list);
-
             v1.Neighbors.Add(str2);
             v1.dist.Add(new Edge(num));
 
@@ -76,9 +67,9 @@ namespace GraphCollections
         private Vertex FindByValue(string str)
         {
             Vertex res = null;
-            foreach (Vertex v in nodeSet)
+            foreach(Vertex v in nodeSet)
             {
-                if (v.data.Equals(str))
+                if(v.data.Equals(str))
                 {
                     res = v;
                 }
@@ -120,14 +111,14 @@ namespace GraphCollections
 
             int index = v1.Neighbors.IndexOf(v2.data);
             int res = v1.dist[index].dist;
-
+            
             return res;
 
         }
 
         public void print()
         {
-            foreach (Vertex v in nodeSet)
+            foreach(Vertex v in nodeSet)
             {
                 foreach (String n in v.Neighbors)
                 {
@@ -146,12 +137,49 @@ namespace GraphCollections
 
             int index = v1.Neighbors.IndexOf(v2.data);
             v1.dist[index].dist = num;
-
+            
         }
 
         public IEnumerator GetEnumerator()
         {
             return ((IEnumerable)nodeSet).GetEnumerator();
+        }
+
+        public int getInputEdgeCount(string str)
+        {
+            if (FindByValue(str) == null)
+                throw new KeyNotFoundException();
+
+            int count = 0;
+            foreach (Vertex gnode in nodeSet)
+            {
+                var list = gnode.Neighbors.FindAll((x)=>x == str);
+                count += list.Count;
+            }
+            return count;
+        }
+
+        public int getOutputEdgeCount(string str)
+        {
+            int count = FindByValue(str).dist.Count;
+            return count;
+        }
+
+        public List<string> getInputVertexNames(string str)
+        {
+            var list = new List<string>();
+            foreach (Vertex gnode in nodeSet)
+            {
+                var list1 = gnode.Neighbors.FindAll((x) => x == str);
+                list.Concat(list1);
+            }
+            return list;
+        }
+
+        public List<string> getOutputVertexNames(string str)
+        {
+            var list = FindByValue(str).Neighbors;
+            return list;
         }
     }
 }
