@@ -7,7 +7,7 @@ namespace UnitTestProject
 {
     [TestFixture(typeof(GraphVertexList))]
     [TestFixture(typeof(GraphVertexArray))]
-    //[TestFixture(typeof(GraphEdgeList))]
+    [TestFixture(typeof(GraphVertexMatrix))]
     public class ListNUnitTests<TGraph> where TGraph : IGraph, new()
     {
         IGraph _graph = new TGraph();
@@ -43,7 +43,6 @@ namespace UnitTestProject
             _graph.addEdge("3", "4", 5);
             _graph.delVertex("3");
             Assert.AreEqual(4, _graph.getVerticesCount());
-            //Assert.AreEqual(0, _graph.EdgeCount);
         }
 
         [Test]
@@ -62,7 +61,6 @@ namespace UnitTestProject
             _graph.addEdge("-1", "1", 5);
 
             Assert.AreEqual(3, _graph.getVerticesCount());
-            //Assert.AreEqual(2, _graph.EdgeCount);
         }
 
         [Test]
@@ -76,7 +74,6 @@ namespace UnitTestProject
             _graph.addEdge("0", "2", 4);
             int w = _graph.delEdge("0", "1");
             Assert.AreEqual(5, _graph.getVerticesCount());
-            //Assert.AreEqual(1, _graph.EdgeCount);
             Assert.AreEqual(5, w);
         }
 

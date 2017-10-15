@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GraphCollections
 {
-    class GraphVertexMatrix : IGraph, IEnumerable
+    public class GraphVertexMatrix : IGraph, IEnumerable
     {
         const int size = 25;
         private Vertex[] nodeSet;
@@ -90,6 +90,22 @@ namespace GraphCollections
             return list;
         }
 
+        private int FindVertexIndex(string str)
+        {
+            int index = -1;
+
+            for (int i = 0; i < size; ++i)
+            {
+                if (nodeSet[i] != null && nodeSet[i].data == str)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        }
+
 
         public void addEdge(string str1, string str2, int num)
         {
@@ -103,7 +119,10 @@ namespace GraphCollections
             {
                 addVertex(str2);
             }
-            v1.dist.Add(new Edge(num, v1, v2));
+            //v1.dist.Add(new Edge(num, v1, v2));
+            int index1 = FindVertexIndex(str1);
+            int index2 = FindVertexIndex(str2);
+            edgeSet[index1, index2] = new Edge(num, v1, v2);
         }
 
 
@@ -113,30 +132,40 @@ namespace GraphCollections
             int index = FirstNullIndex();
             if (index >= 0)
             {
-
-            }
                 nodeSet[index] = new Vertex(str);
+            }
             else
-                throw new OverflowException();
+                throw new KeyNotFoundException();
         }
 
         public int delEdge(string str1, string str2)
         {
-            Vertex v1 = FindVertexByValue(str1);
-            Vertex v2 = FindVertexByValue(str2);
+            //Vertex v1 = FindVertexByValue(str1);
+            //Vertex v2 = FindVertexByValue(str2);
 
-            if (v1 == null || v2 == null)
+            //if (v1 == null || v2 == null)
+            //    throw new KeyNotFoundException();
+
+            int index1 = FindVertexIndex(str1);
+            int index2 = FindVertexIndex(str2);
+
+            if (index1 < 0 && index2 < 0)
                 throw new KeyNotFoundException();
 
-
-
-            List<Edge> edgesList = FindEdgesByVertices(v1, v2);
-
-            if (edgesList.Count == 0)
+            if (edgeSet[index1, index2] == null)
                 throw new KeyNotFoundException();
 
-            int res = edgesList[0].dist;
-            v1.dist.Remove(edgesList[0]);
+            int res = edgeSet[index1, index2].dist;
+            edgeSet[index1, index2] = null;
+
+
+            //List<Edge> edgesList = FindEdgesByVertices(v1, v2);
+
+            //if (edgesList.Count == 0)
+            //    throw new KeyNotFoundException();
+
+            //int res = edgesList[0].dist;
+            //v1.dist.Remove(edgesList[0]);
 
             return res;
         }
@@ -156,68 +185,53 @@ namespace GraphCollections
             return res;
         }
 
-        private List<Edge> FindEdgesByVertices(Vertex from, Vertex to)
-        {
-            List<Edge> res = new List<Edge>();
+        //private List<Edge> FindEdgesByVertices(Vertex from, Vertex to)
+        //{
+        //    List<Edge> res = new List<Edge>();
 
-            foreach (Edge edge in from.dist)
-            {
-                if (edge.to.Equals(to))
-                {
-                    res.Add(edge);
-                    break;
-                }
-            }
+        //    foreach (Edge edge in from.dist)
+        //    {
+        //        if (edge.to.Equals(to))
+        //        {
+        //            res.Add(edge);
+        //            break;
+        //        }
+        //    }
 
 
-            return res;
-        }
+        //    return res;
+        //}
 
 
         public void delVertex(string str)
         {
-            Vertex nodeToRemove = FindVertexByValue(str);
+            int index = FindVertexIndex(str);
 
-            if (nodeToRemove == null)
+            if (index < 0)
                 throw new KeyNotFoundException();
-
-            List<Edge> edgesToRemove;
-            var vertexList = GetAllVertices();
-
-            foreach (Vertex v in vertexList)
-            {
-                edgesToRemove = FindEdgesByVertices(v, nodeToRemove);
-                foreach (Edge e in edgesToRemove)
-                {
-                    v.dist.Remove(e);
-                }
-            }
 
             for (int i = 0; i < size; ++i)
             {
-                if (nodeSet[i] == nodeToRemove)
-                {
-                    nodeSet[i] = null;
-                    break;
-                }
+                this.edgeSet[i, index] = null;
+                this.edgeSet[index, i] = null;
             }
+
+            nodeSet[index] = null;
         }
 
         public int getEdge(string str1, string str2)
         {
-            Vertex v1 = FindVertexByValue(str1);
-            Vertex v2 = FindVertexByValue(str2);
+            int index1 = FindVertexIndex(str1);
+            int index2 = FindVertexIndex(str2);
 
-            if (v1 == null || v2 == null)
+            if (index1 < 0 && index2 < 0)
+                throw new KeyNotFoundException();
+            
+            if (edgeSet[index1, index2] == null)
                 throw new KeyNotFoundException();
 
-            List<Edge> edgesList = FindEdgesByVertices(v1, v2);
-
-            if (edgesList.Count == 0)
-                throw new KeyNotFoundException();
-
-            int res = edgesList[0].dist;
-
+            int res = edgeSet[index1, index2].dist;
+                        
             return res;
 
         }
@@ -227,30 +241,34 @@ namespace GraphCollections
             var vertexList = GetAllVertices();
             foreach (Vertex v in vertexList)
             {
+                int index = FindVertexIndex(v.data);
 
-                foreach (Edge edge in v.dist)
+                for (int i = 0; i < size; ++i)
                 {
-                    Console.WriteLine(v.data + " -> " + edge.dist + " -> " + edge.to.data);
-                }
-                Console.WriteLine();
+                    Edge edge = this.edgeSet[index, i];
+                    Vertex outputVertex = nodeSet[i];
 
+                    if (edge == null)
+                        throw new KeyNotFoundException();
+                    
+                    if (outputVertex == null)
+                        throw new KeyNotFoundException();
+
+
+                    Console.WriteLine(v.data + " -> " + edge.dist + " -> " + outputVertex.data);
+                }
             }
         }
 
         public void setEdge(string str1, string str2, int num)
         {
-            Vertex v1 = FindVertexByValue(str1);
-            Vertex v2 = FindVertexByValue(str2);
+            int index1 = FindVertexIndex(str1);
+            int index2 = FindVertexIndex(str2);
 
-            if (v1 == null && v2 == null)
+            if (index1 < 0 && index2 < 0)
                 throw new KeyNotFoundException();
-
-            List<Edge> edgesList = FindEdgesByVertices(v1, v2);
-
-            if (edgesList.Count == 0)
-                throw new KeyNotFoundException();
-
-            edgesList[0].dist = num;
+            
+            edgeSet[index1, index2].dist = num;
 
         }
 
@@ -261,65 +279,81 @@ namespace GraphCollections
 
         public int getInputEdgeCount(string str)
         {
-            Vertex vertex = FindVertexByValue(str);
+            int index = FindVertexIndex(str);
+            int count = 0;
 
-            if (vertex == null)
+            if (index < 0)
                 throw new KeyNotFoundException();
 
-            int count = 0;
-            List<Edge> edgesToCount;
-            var vertexList = GetAllVertices();
-            foreach (Vertex v in vertexList)
+            for (int i = 0; i < size; ++i)
             {
-                edgesToCount = FindEdgesByVertices(v, vertex);
-                count += edgesToCount.Count;
+                Edge edge = edgeSet[i, index];
+
+                if (edge != null)
+                    count++;
+                
             }
+
             return count;
         }
 
         public int getOutputEdgeCount(string str)
         {
-            Vertex vertex = FindVertexByValue(str);
+            int index = FindVertexIndex(str);
+            int count = 0;
 
-            if (vertex == null)
+            if (index < 0)
                 throw new KeyNotFoundException();
 
-            int count = vertex.dist.Count;
+            for (int i = 0; i < size; ++i)
+            {
+                Edge edge = edgeSet[index, i];
+
+                if (edge != null)
+                    count++;
+
+            }
+
             return count;
         }
 
         public List<string> getInputVertexNames(string str)
         {
-            Vertex vertexCheck = FindVertexByValue(str);
+            int index = FindVertexIndex(str);
 
-            if (vertexCheck == null)
+            if (index < 0)
                 throw new KeyNotFoundException();
 
             var list = new List<string>();
-            var vertexList = GetAllVertices();
-            foreach (Vertex vertex in vertexList)
+
+            for (int i = 0; i < size; ++i)
             {
-                foreach (Edge edge in vertex.dist)
-                {
-                    if (edge.to.data.Equals(str))
-                        list.Add(edge.from.data);
-                }
+                Edge edge = edgeSet[i, index];
+
+                if (edge != null)
+                    list.Add(nodeSet[i].data);
+
             }
+            
             return list;
         }
 
         public List<string> getOutputVertexNames(string str)
         {
-            Vertex vertex = FindVertexByValue(str);
+            int index = FindVertexIndex(str);
 
-            if (vertex == null)
+            if (index < 0)
                 throw new KeyNotFoundException();
 
             var list = new List<string>();
 
-            foreach (Edge edge in vertex.dist)
+            for (int i = 0; i < size; ++i)
             {
-                list.Add(edge.to.data);
+                Edge edge = edgeSet[index, i];
+
+                if (edge != null)
+                    list.Add(nodeSet[i].data);
+
             }
 
             return list;

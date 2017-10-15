@@ -96,7 +96,7 @@ namespace GraphCollections
             if (index >= 0)
                 nodeSet[index] = new Vertex(str);
             else
-                throw new OverflowException();
+                throw new KeyNotFoundException();
         }
 
         public int delEdge(string str1, string str2)
