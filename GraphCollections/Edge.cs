@@ -11,19 +11,21 @@ namespace GraphCollections
         public int dist;
         public Vertex from;
         public Vertex to;
+        public bool isVisited;
 
         public Edge()
         {
             dist = 0;
             from = null;
             to = null;
-
+            init();
         }
         public Edge(int num)
         {
             dist = num;
             from = null;
             to = null;
+            init();
         }
 
         public Edge(int num, Vertex from, Vertex to)
@@ -31,6 +33,12 @@ namespace GraphCollections
             dist = num;
             this.from = from;
             this.to = to;
+            init();
+        }
+
+        public void init()
+        {
+            isVisited = false;
         }
     }
 }

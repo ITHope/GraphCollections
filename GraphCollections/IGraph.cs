@@ -23,5 +23,7 @@ namespace GraphCollections
         List<string> getOutputVertexNames(string str);
 
         int getVerticesCount();
+
+        int MinLength(string str1, string str2);
     }
 }

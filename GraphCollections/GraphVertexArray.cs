@@ -303,5 +303,10 @@ namespace GraphCollections
 
             return list;
         }
+
+        public int MinLength(string str1, string str2)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

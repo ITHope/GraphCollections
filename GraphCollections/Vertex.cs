@@ -11,10 +11,14 @@ namespace GraphCollections
         public string data;
         public List<Edge> dist;
 
+        public bool isVisited;
+        public int length;
+
         public Vertex() : this(null, null) { }
         public Vertex(string data) : this(data, null) { }
         public Vertex(string data, List<Edge> edges)
         {
+            
             this.data = data;
             if (edges == null)
             {
@@ -24,7 +28,7 @@ namespace GraphCollections
             {
                 this.dist = edges;
             }
-
+            init();
         }
 
         public string Value
@@ -48,6 +52,14 @@ namespace GraphCollections
 
                 return dist;
             }
+        }
+
+        public void init(int defLength = -1)
+        {
+            length = defLength;
+            isVisited = false;
+            foreach (Edge e in dist)
+                e.init();
         }
     }
 }

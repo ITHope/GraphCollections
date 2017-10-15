@@ -244,5 +244,100 @@ namespace GraphCollections
             
             return list;
         }
+
+        // Get min of unvisited edges
+        private Edge getMinEdge(Vertex v)
+        {
+            int minDist = -1;
+            Edge minEdge = null;
+            foreach (Edge edge in v.dist)
+            {
+                if (!edge.isVisited)
+                {
+                    if (edge.dist < minDist || minDist < 0)
+                    {
+                        minDist = edge.dist;
+                        minEdge = edge;
+                    }
+                }
+            }
+
+            return minEdge;
+        }
+
+        // Get min of edges with unvisited vertices
+        private Vertex getMinVertex(Vertex v)
+        {
+            int minDist = -1;
+            Vertex minVertex = null;
+            foreach (Edge edge in v.dist)
+            {
+                if (!edge.to.isVisited)
+                {
+                    if (edge.dist < minDist || minDist < 0)
+                    {
+                        minDist = edge.dist;
+                        minVertex = edge.to;
+                    }
+                }
+            }
+
+            return minVertex;
+        }
+
+        private void GreedyStep(Vertex currentVertex)
+        {
+            Edge eMin;
+            do
+            {
+                eMin = getMinEdge(currentVertex);
+                if (eMin != null)
+                {
+                    if (eMin.to.length < 0 || eMin.to.length > currentVertex.length + eMin.dist)
+                        eMin.to.length = currentVertex.length + eMin.dist;
+
+                    eMin.isVisited = true;
+                }
+            } while (eMin != null);
+
+            currentVertex.isVisited = true;
+
+            Vertex vMin;
+            do
+            {
+                vMin = getMinVertex(currentVertex);
+                if (vMin != null)
+                {
+                    vMin.isVisited = true;
+                    GreedyStep(vMin);
+                }
+            } while (vMin != null);
+        }
+
+
+        public int MinLength(string str1, string str2)
+        {
+            foreach(Vertex v in nodeSet)
+            {
+                v.init();
+            }
+
+            Vertex v1 = FindVertexByValue(str1);
+            Vertex v2 = FindVertexByValue(str2);
+
+            if (v1 == null && v2 == null)
+                throw new KeyNotFoundException();
+
+            v1.length = 0;
+
+            if (v1 == v2)
+                return 0;
+
+            v1.isVisited = true;
+            GreedyStep(v1);
+
+            return v2.length;
+
+        }
     }
 }
