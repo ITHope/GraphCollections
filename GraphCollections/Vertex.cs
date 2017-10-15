@@ -9,23 +9,13 @@ namespace GraphCollections
     public class Vertex
     {
         public string data;
-        private List<string> neighbors;
         public List<Edge> dist;
 
         public Vertex() : this(null, null) { }
-        public Vertex(string data) : this(data, null, null) { }
-        public Vertex(string data, List<string> neighbors) : this(data, neighbors, null) { }
-        public Vertex(string data, List<string> neighbors, List<Edge> edges)
+        public Vertex(string data) : this(data, null) { }
+        public Vertex(string data, List<Edge> edges)
         {
             this.data = data;
-            if (neighbors == null)
-            {
-                this.neighbors = new List<string>();
-            }
-            else
-            {
-                this.neighbors = neighbors;
-            }
             if (edges == null)
             {
                 this.dist = new List<Edge>();
@@ -46,22 +36,6 @@ namespace GraphCollections
             set
             {
                 data = value;
-            }
-        }
-
-
-        public List<string> Neighbors
-        {
-            get
-            {
-                if (neighbors == null)
-                    neighbors = new List<string>();
-
-                return neighbors;
-            }
-            set
-            {
-                neighbors = value;
             }
         }
 

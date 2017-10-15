@@ -7,19 +7,20 @@ using System.Threading.Tasks;
 
 namespace GraphCollections
 {
-    public class GraphVertexArray : IGraph, IEnumerable
+    class GraphVertexMatrix : IGraph, IEnumerable
     {
         const int size = 25;
-        public Vertex[] nodeSet;
+        private Vertex[] nodeSet;
+        private Edge[,] edgeSet; 
 
-        public GraphVertexArray() : this(null) { }
+        public GraphVertexMatrix() : this(null, null) { }
 
-        public GraphVertexArray(Vertex[] nodeSet)
+        public GraphVertexMatrix(Vertex[] nodeSet, Edge [,] edgeSet)
         {
             if (nodeSet == null)
             {
                 this.nodeSet = new Vertex[size];
-                for (int i=0; i<size; ++i)
+                for (int i = 0; i < size; ++i)
                 {
                     this.nodeSet[i] = null;
                 }
@@ -27,6 +28,23 @@ namespace GraphCollections
             else
             {
                 this.nodeSet = nodeSet;
+            }
+
+
+            if (edgeSet == null)
+            {
+                this.edgeSet = new Edge[size,size];
+                for (int i = 0; i < size; ++i)
+                {
+                    for (int j = 0; j < size; ++j)
+                    {
+                        this.edgeSet[i,j] = null;
+                    }
+                }
+            }
+            else
+            {
+                this.edgeSet = edgeSet;
             }
         }
 
@@ -47,7 +65,7 @@ namespace GraphCollections
 
             for (int i = 0; i < size; ++i)
             {
-                if(nodeSet[i] == null)
+                if (nodeSet[i] == null)
                 {
                     index = i;
                     break;
@@ -94,6 +112,9 @@ namespace GraphCollections
         {
             int index = FirstNullIndex();
             if (index >= 0)
+            {
+
+            }
                 nodeSet[index] = new Vertex(str);
             else
                 throw new OverflowException();
@@ -127,10 +148,10 @@ namespace GraphCollections
             foreach (Vertex v in vertexList)
             {
                 if (v.data.Equals(str))
-                    {
-                        res = v;
-                        break;
-                    }
+                {
+                    res = v;
+                    break;
+                }
             }
             return res;
         }
@@ -172,7 +193,7 @@ namespace GraphCollections
                 }
             }
 
-            for (int i=0; i<size; ++i)
+            for (int i = 0; i < size; ++i)
             {
                 if (nodeSet[i] == nodeToRemove)
                 {

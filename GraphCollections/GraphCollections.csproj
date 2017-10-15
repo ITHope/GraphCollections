@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="Edge.cs" />
     <Compile Include="EdgeList.cs" />
-    <Compile Include="GraphEdgesList.cs" />
+    <Compile Include="GraphVertexMatrix.cs" />
     <Compile Include="GraphVertexArray.cs" />
     <Compile Include="GraphVertexList.cs" />
     <Compile Include="IGraph.cs" />

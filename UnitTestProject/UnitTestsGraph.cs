@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace UnitTestProject
 {
-    [TestFixture(typeof(GraphL))]
-    //[TestFixture(typeof(GraphMatrix))]
-    [TestFixture(typeof(GraphEdgeList))]
+    [TestFixture(typeof(GraphVertexList))]
+    [TestFixture(typeof(GraphVertexArray))]
+    //[TestFixture(typeof(GraphEdgeList))]
     public class ListNUnitTests<TGraph> where TGraph : IGraph, new()
     {
         IGraph _graph = new TGraph();
@@ -27,11 +27,9 @@ namespace UnitTestProject
             for (int i = 0; i < n; i++)
             {
                 _graph.addVertex(i.ToString());
-                _graph.addVertex(i.ToString());
             }
 
-            Assert.AreEqual(n, _graph.nodeSet.Count);
-            //Assert.AreEqual(0, _graph.EdgeCount);
+            Assert.AreEqual(n, _graph.getVerticesCount());
         }
 
         [Test]
@@ -44,7 +42,7 @@ namespace UnitTestProject
             _graph.addEdge("0", "3", 4);
             _graph.addEdge("3", "4", 5);
             _graph.delVertex("3");
-            Assert.AreEqual(4, _graph.nodeSet.Count);
+            Assert.AreEqual(4, _graph.getVerticesCount());
             //Assert.AreEqual(0, _graph.EdgeCount);
         }
 
@@ -63,7 +61,7 @@ namespace UnitTestProject
             _graph.addVertex("1");
             _graph.addEdge("-1", "1", 5);
 
-            Assert.AreEqual(3, _graph.nodeSet.Count);
+            Assert.AreEqual(3, _graph.getVerticesCount());
             //Assert.AreEqual(2, _graph.EdgeCount);
         }
 
@@ -77,7 +75,7 @@ namespace UnitTestProject
             _graph.addEdge("0", "1", 5);
             _graph.addEdge("0", "2", 4);
             int w = _graph.delEdge("0", "1");
-            Assert.AreEqual(5, _graph.nodeSet.Count);
+            Assert.AreEqual(5, _graph.getVerticesCount());
             //Assert.AreEqual(1, _graph.EdgeCount);
             Assert.AreEqual(5, w);
         }
@@ -98,8 +96,7 @@ namespace UnitTestProject
             _graph.addEdge("0", "1", 5);
             _graph.addEdge("0", "2", 4);
             int w = _graph.getEdge("0", "1");
-            Assert.AreEqual(5, _graph.nodeSet.Count);
-            //Assert.AreEqual(2, _graph.EdgeCount);
+            Assert.AreEqual(5, _graph.getVerticesCount());
             Assert.AreEqual(5, w);
         }
 
@@ -119,8 +116,7 @@ namespace UnitTestProject
             _graph.addEdge("0", "1", 5);
             _graph.addEdge("0", "2", 4);
             _graph.setEdge("0", "1", 6);
-            Assert.AreEqual(5, _graph.nodeSet.Count);
-            //Assert.AreEqual(2, _graph.EdgeCount);
+            Assert.AreEqual(5, _graph.getVerticesCount());
             Assert.AreEqual(6, _graph.getEdge("0", "1"));
         }
 
@@ -134,13 +130,13 @@ namespace UnitTestProject
             _graph.addEdge("0", "1", 5);
             _graph.addEdge("0", "2", 4);
             _graph.setEdge("0", "1", 6);
-            Assert.AreEqual(2, _graph.GetInputEdgeCount("1"));
+            Assert.AreEqual(1, _graph.getInputEdgeCount("1"));
         }
 
         [Test]
         public void TestGetInputEdgeCountEx()
         {
-            Assert.Throws<KeyNotFoundException>(() => _graph.GetInputEdgeCount("6"));
+            Assert.Throws<KeyNotFoundException>(() => _graph.getInputEdgeCount("6"));
         }
 
         [Test]
@@ -153,13 +149,13 @@ namespace UnitTestProject
             _graph.addEdge("0", "1", 5);
             _graph.addEdge("0", "2", 4);
             _graph.setEdge("0", "1", 6);
-            Assert.AreEqual(3, _graph.GetOutputEdgeCount("0"));
+            Assert.AreEqual(2, _graph.getOutputEdgeCount("0"));
         }
 
         [Test]
-        public void TestGetInputEdgeCountEx()
+        public void TestGetOutputEdgeCountEx()
         {
-            Assert.Throws<KeyNotFoundException>(() => _graph.GetOutputEdgeCount("6"));
+            Assert.Throws<KeyNotFoundException>(() => _graph.getOutputEdgeCount("6"));
         }
 
         [Test]
@@ -172,15 +168,15 @@ namespace UnitTestProject
             _graph.addEdge("0", "1", 5);
             _graph.addEdge("0", "2", 4);
             _graph.setEdge("0", "1", 6);
-            List<Vertex> list = new List<Vertex>();
+            List<string> list = new List<string>();
             list.Add("0");
-            Assert.AreEqual(list, _graph.GetInputVertexNames("2"));
+            Assert.AreEqual(list, _graph.getInputVertexNames("2"));
         }
 
         [Test]
         public void TestGetInputVertexNamesEx()
         {
-            Assert.Throws<KeyNotFoundException>(() => _graph.GetInputVertexNames("6"));
+            Assert.Throws<KeyNotFoundException>(() => _graph.getInputVertexNames("6"));
         }
 
         [Test]
@@ -193,16 +189,16 @@ namespace UnitTestProject
             _graph.addEdge("0", "1", 5);
             _graph.addEdge("0", "2", 4);
             _graph.setEdge("0", "1", 6);
-            List<Vertex> list = new List<Vertex>();
+            List<string> list = new List<string>();
             list.Add("1");
             list.Add("2");
-            Assert.AreEqual(list, _graph.GetOutputVertexNames("0"));
+            Assert.AreEqual(list, _graph.getOutputVertexNames("0"));
         }
 
         [Test]
         public void TestGetOutputVertexNamesEx()
         {
-            Assert.Throws<KeyNotFoundException>(() => _graph.GetOutputVertexNames("6"));
+            Assert.Throws<KeyNotFoundException>(() => _graph.getOutputVertexNames("6"));
         }
     }
 }

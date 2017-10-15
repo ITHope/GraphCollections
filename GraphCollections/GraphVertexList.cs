@@ -21,10 +21,17 @@ namespace GraphCollections
                 this.nodeSet = nodeSet;
         }
 
+        public int getVerticesCount()
+        {
+            return nodeSet.Count;
+        }
+
+
+
         public void addEdge(string str1, string str2, int num)
         {
-            Vertex v1 = FindByValue(str1);
-            Vertex v2 = FindByValue(str2);
+            Vertex v1 = FindVertexByValue(str1);
+            Vertex v2 = FindVertexByValue(str2);
             if (v1 == null)
             {
                 v1 = new Vertex(str1);
@@ -35,8 +42,7 @@ namespace GraphCollections
                 v2 = new Vertex(str2);
                 nodeSet.Add(v2);
             }
-            v1.Neighbors.Add(str2);
-            v1.dist.Add(new Edge(num));
+            v1.dist.Add(new Edge(num, v1, v2));
 
         }
 
@@ -47,24 +53,26 @@ namespace GraphCollections
 
         public int delEdge(string str1, string str2)
         {
-            Vertex v1 = FindByValue(str1);
-            Vertex v2 = FindByValue(str2);
+            Vertex v1 = FindVertexByValue(str1);
+            Vertex v2 = FindVertexByValue(str2);
 
-            if (v1 == null && v2 == null)
+            if (v1 == null || v2 == null)
                 throw new KeyNotFoundException();
 
+            
 
-            int index = v1.Neighbors.IndexOf(v2.data);
-            int res = v1.dist[index].dist;
+            List<Edge> edgesList = FindEdgesByVertices(v1, v2);
+            
+            if (edgesList.Count == 0)
+                throw new KeyNotFoundException();
 
-            v1.Neighbors.RemoveAt(index);
-            v1.dist.RemoveAt(index);
-            v2.Neighbors.Remove(str1);
+            int res = edgesList[0].dist;
+            v1.dist.Remove(edgesList[0]);
 
             return res;
         }
 
-        private Vertex FindByValue(string str)
+        private Vertex FindVertexByValue(string str)
         {
             Vertex res = null;
             foreach(Vertex v in nodeSet)
@@ -72,46 +80,67 @@ namespace GraphCollections
                 if(v.data.Equals(str))
                 {
                     res = v;
+                    break;
                 }
             }
             return res;
         }
 
-        public void delVertex(string str)
+        private List<Edge> FindEdgesByVertices(Vertex from, Vertex to)
         {
-            // first remove the node from the nodeset
-            Vertex nodeToRemove = FindByValue(str);
-            if (nodeToRemove == null)
-                // node wasn't found
-                throw new KeyNotFoundException();
+            List<Edge> res = new List<Edge>();
 
-            // otherwise, the node was found
-            nodeSet.Remove(nodeToRemove);
-
-            // enumerate through each node in the nodeSet, removing edges to this node
-            foreach (Vertex gnode in nodeSet)
+            foreach (Edge edge in from.dist)
             {
-                int index = gnode.Neighbors.IndexOf(nodeToRemove.data);
-                if (index != -1)
+                if (edge.to.Equals(to))
                 {
-                    // remove the reference to the node and associated cost
-                    gnode.Neighbors.RemoveAt(index);
-                    gnode.dist.RemoveAt(index);
+                    res.Add(edge);
+                    break;
                 }
             }
+
+
+            return res;
+        }
+
+
+        public void delVertex(string str)
+        {
+            Vertex nodeToRemove = FindVertexByValue(str);
+
+            if (nodeToRemove == null)
+                throw new KeyNotFoundException();
+           
+            List<Edge> edgesToRemove;
+
+            foreach (Vertex v in nodeSet)
+            {
+                edgesToRemove = FindEdgesByVertices(v, nodeToRemove);
+                foreach(Edge e in edgesToRemove)
+                {
+                    v.dist.Remove(e);
+                }
+            }
+
+            nodeSet.Remove(nodeToRemove);
+
         }
 
         public int getEdge(string str1, string str2)
         {
-            Vertex v1 = FindByValue(str1);
-            Vertex v2 = FindByValue(str2);
+            Vertex v1 = FindVertexByValue(str1);
+            Vertex v2 = FindVertexByValue(str2);
 
-            if (v1 == null && v2 == null)
+            if (v1 == null || v2 == null)
                 throw new KeyNotFoundException();
 
-            int index = v1.Neighbors.IndexOf(v2.data);
-            int res = v1.dist[index].dist;
-            
+            List<Edge> edgesList = FindEdgesByVertices(v1, v2);
+
+            if (edgesList.Count == 0)
+                throw new KeyNotFoundException();
+
+            int res = edgesList[0].dist;
+
             return res;
 
         }
@@ -120,23 +149,30 @@ namespace GraphCollections
         {
             foreach(Vertex v in nodeSet)
             {
-                foreach (String n in v.Neighbors)
+                
+                foreach (Edge edge in v.dist)
                 {
-                    Console.WriteLine(v.data + " -> " + n + " = " + getEdge(v.data, n));
+                    Console.WriteLine(v.data + " -> " + edge.dist + " -> "  + edge.to.data);
                 }
+                Console.WriteLine();
+
             }
         }
 
         public void setEdge(string str1, string str2, int num)
         {
-            Vertex v1 = FindByValue(str1);
-            Vertex v2 = FindByValue(str2);
+            Vertex v1 = FindVertexByValue(str1);
+            Vertex v2 = FindVertexByValue(str2);
 
             if (v1 == null && v2 == null)
                 throw new KeyNotFoundException();
 
-            int index = v1.Neighbors.IndexOf(v2.data);
-            v1.dist[index].dist = num;
+            List<Edge> edgesList = FindEdgesByVertices(v1, v2);
+
+            if (edgesList.Count == 0)
+                throw new KeyNotFoundException();
+            
+            edgesList[0].dist = num;
             
         }
 
@@ -144,41 +180,68 @@ namespace GraphCollections
         {
             return ((IEnumerable)nodeSet).GetEnumerator();
         }
-
+        
         public int getInputEdgeCount(string str)
         {
-            if (FindByValue(str) == null)
+            Vertex vertex = FindVertexByValue(str);
+
+            if (vertex == null)
                 throw new KeyNotFoundException();
 
             int count = 0;
-            foreach (Vertex gnode in nodeSet)
+            List<Edge> edgesToCount;
+            foreach (Vertex v in nodeSet)
             {
-                var list = gnode.Neighbors.FindAll((x)=>x == str);
-                count += list.Count;
+                edgesToCount = FindEdgesByVertices(v, vertex);
+                count += edgesToCount.Count;
             }
             return count;
         }
 
         public int getOutputEdgeCount(string str)
         {
-            int count = FindByValue(str).dist.Count;
+            Vertex vertex = FindVertexByValue(str);
+
+            if (vertex == null)
+                throw new KeyNotFoundException();
+
+            int count = vertex.dist.Count;
             return count;
         }
 
         public List<string> getInputVertexNames(string str)
         {
+            Vertex vertexCheck = FindVertexByValue(str);
+
+            if (vertexCheck == null)
+                throw new KeyNotFoundException();
+
             var list = new List<string>();
-            foreach (Vertex gnode in nodeSet)
+            foreach (Vertex vertex in nodeSet)
             {
-                var list1 = gnode.Neighbors.FindAll((x) => x == str);
-                list.Concat(list1);
+                foreach (Edge edge in vertex.dist)
+                {
+                    if(edge.to.data.Equals(str))
+                        list.Add(edge.from.data);
+                }
             }
             return list;
         }
 
         public List<string> getOutputVertexNames(string str)
         {
-            var list = FindByValue(str).Neighbors;
+            Vertex vertex = FindVertexByValue(str);
+
+            if (vertex == null)
+                throw new KeyNotFoundException();
+
+            var list = new List<string>();
+
+            foreach (Edge edge in vertex.dist)
+            {
+                list.Add(edge.to.data);
+            }
+            
             return list;
         }
     }
