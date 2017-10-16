@@ -197,5 +197,64 @@ namespace UnitTestProject
         {
             Assert.Throws<KeyNotFoundException>(() => _graph.getOutputVertexNames("6"));
         }
+
+
+        [Test]
+        public void TestMinLength()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                _graph.addVertex(i.ToString());
+            }
+            _graph.addEdge("0", "1", 5);
+            _graph.addEdge("0", "2", 4);
+            _graph.setEdge("0", "1", 6);
+            
+            Assert.AreEqual(6, _graph.MinLength("0", "1"));
+        }
+
+        [TestCase("Vertex1", "Vertex5", 20)]
+        [TestCase("Vertex1", "Vertex6", 11)]
+        [TestCase("Vertex1", "Vertex4", 20)]
+        [TestCase("Vertex1", "Vertex3", 9)]
+        [TestCase("Vertex1", "Vertex1", 0)]
+        [TestCase("Vertex1", "Vertex2", 7)]
+        public void TestMinLengthFull(string str1, string str2, int length)
+        {
+            for (int i = 1; i < 7; ++i)
+                _graph.addVertex("Vertex" + i);
+
+            _graph.addEdge("Vertex1", "Vertex2", 7);
+            _graph.addEdge("Vertex1", "Vertex3", 9);
+            _graph.addEdge("Vertex1", "Vertex6", 14);
+
+            _graph.addEdge("Vertex2", "Vertex1", 7);
+            _graph.addEdge("Vertex2", "Vertex3", 10);
+            _graph.addEdge("Vertex2", "Vertex4", 15);
+
+            _graph.addEdge("Vertex3", "Vertex1", 9);
+            _graph.addEdge("Vertex3", "Vertex2", 10);
+            _graph.addEdge("Vertex3", "Vertex4", 11);
+            _graph.addEdge("Vertex3", "Vertex6", 2);
+
+            _graph.addEdge("Vertex4", "Vertex2", 15);
+            _graph.addEdge("Vertex4", "Vertex3", 11);
+            _graph.addEdge("Vertex4", "Vertex5", 6);
+
+            _graph.addEdge("Vertex5", "Vertex4", 6);
+            _graph.addEdge("Vertex5", "Vertex6", 9);
+
+            _graph.addEdge("Vertex6", "Vertex1", 14);
+            _graph.addEdge("Vertex6", "Vertex3", 2);
+            _graph.addEdge("Vertex6", "Vertex5", 9);
+
+            Assert.AreEqual(length, _graph.MinLength(str1, str2));
+        }
+
+        [Test]
+        public void TestMinLengthEx()
+        {
+            Assert.Throws<KeyNotFoundException>(() => _graph.MinLength("7", "1"));
+        }
     }
 }

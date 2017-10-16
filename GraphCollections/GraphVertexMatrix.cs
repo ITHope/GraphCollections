@@ -111,17 +111,20 @@ namespace GraphCollections
         {
             Vertex v1 = FindVertexByValue(str1);
             Vertex v2 = FindVertexByValue(str2);
+
             if (v1 == null)
             {
                 addVertex(str1);
             }
+
             if (v2 == null)
             {
                 addVertex(str2);
             }
-            //v1.dist.Add(new Edge(num, v1, v2));
+
             int index1 = FindVertexIndex(str1);
             int index2 = FindVertexIndex(str2);
+
             edgeSet[index1, index2] = new Edge(num, v1, v2);
         }
 
@@ -140,11 +143,6 @@ namespace GraphCollections
 
         public int delEdge(string str1, string str2)
         {
-            //Vertex v1 = FindVertexByValue(str1);
-            //Vertex v2 = FindVertexByValue(str2);
-
-            //if (v1 == null || v2 == null)
-            //    throw new KeyNotFoundException();
 
             int index1 = FindVertexIndex(str1);
             int index2 = FindVertexIndex(str2);
@@ -157,15 +155,6 @@ namespace GraphCollections
 
             int res = edgeSet[index1, index2].dist;
             edgeSet[index1, index2] = null;
-
-
-            //List<Edge> edgesList = FindEdgesByVertices(v1, v2);
-
-            //if (edgesList.Count == 0)
-            //    throw new KeyNotFoundException();
-
-            //int res = edgesList[0].dist;
-            //v1.dist.Remove(edgesList[0]);
 
             return res;
         }
@@ -185,23 +174,6 @@ namespace GraphCollections
             return res;
         }
 
-        //private List<Edge> FindEdgesByVertices(Vertex from, Vertex to)
-        //{
-        //    List<Edge> res = new List<Edge>();
-
-        //    foreach (Edge edge in from.dist)
-        //    {
-        //        if (edge.to.Equals(to))
-        //        {
-        //            res.Add(edge);
-        //            break;
-        //        }
-        //    }
-
-
-        //    return res;
-        //}
-
 
         public void delVertex(string str)
         {
@@ -212,8 +184,8 @@ namespace GraphCollections
 
             for (int i = 0; i < size; ++i)
             {
-                this.edgeSet[i, index] = null;
-                this.edgeSet[index, i] = null;
+                edgeSet[i, index] = null;
+                edgeSet[index, i] = null;
             }
 
             nodeSet[index] = null;
@@ -245,7 +217,7 @@ namespace GraphCollections
 
                 for (int i = 0; i < size; ++i)
                 {
-                    Edge edge = this.edgeSet[index, i];
+                    Edge edge = edgeSet[index, i];
                     Vertex outputVertex = nodeSet[i];
 
                     if (edge == null)
@@ -359,9 +331,102 @@ namespace GraphCollections
             return list;
         }
 
+        // Get min of unvisited edges
+        private Edge getMinEdge(Vertex v)
+        {
+            int minDist = -1;
+            Edge minEdge = null;
+            int index = FindVertexIndex(v.data);
+
+            foreach (Edge edge in v.dist)
+            {
+                if (!edge.isVisited)
+                {
+                    if (edge.dist < minDist || minDist < 0)
+                    {
+                        minDist = edge.dist;
+                        minEdge = edge;
+                    }
+                }
+            }
+
+            return minEdge;
+        }
+
+        // Get min of edges with unvisited vertices
+        private Vertex getMinVertex(Vertex v)
+        {
+            int minDist = -1;
+            Vertex minVertex = null;
+            foreach (Edge edge in v.dist)
+            {
+                if (!edge.to.isVisited)
+                {
+                    if (edge.dist < minDist || minDist < 0)
+                    {
+                        minDist = edge.dist;
+                        minVertex = edge.to;
+                    }
+                }
+            }
+
+            return minVertex;
+        }
+
+        private void GreedyStep(Vertex currentVertex)
+        {
+            Edge eMin;
+            do
+            {
+                eMin = getMinEdge(currentVertex);
+                if (eMin != null)
+                {
+                    if (eMin.to.length < 0 || eMin.to.length > currentVertex.length + eMin.dist)
+                        eMin.to.length = currentVertex.length + eMin.dist;
+
+                    eMin.isVisited = true;
+                }
+            } while (eMin != null);
+
+            currentVertex.isVisited = true;
+
+            Vertex vMin;
+            do
+            {
+                vMin = getMinVertex(currentVertex);
+                if (vMin != null)
+                {
+                    vMin.isVisited = true;
+                    GreedyStep(vMin);
+                }
+            } while (vMin != null);
+        }
+
+
         public int MinLength(string str1, string str2)
         {
-            throw new NotImplementedException();
+            List<Vertex> filledList = GetAllVertices();
+            foreach (Vertex v in filledList)
+            {
+                v.init();
+            }
+
+            Vertex v1 = FindVertexByValue(str1);
+            Vertex v2 = FindVertexByValue(str2);
+
+            if (v1 == null && v2 == null)
+                throw new KeyNotFoundException();
+
+            v1.length = 0;
+
+            if (v1 == v2)
+                return 0;
+
+            v1.isVisited = true;
+            GreedyStep(v1);
+
+            return v2.length;
+
         }
     }
 }
