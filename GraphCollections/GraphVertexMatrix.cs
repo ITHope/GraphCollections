@@ -331,14 +331,32 @@ namespace GraphCollections
             return list;
         }
 
+        private List<Edge> FindEdgesListByVertex(Vertex v)
+        {
+            List<Edge> resList = new List<Edge>();
+
+            int index = FindVertexIndex(v.data);
+
+            for (int i = 0; i < size; ++i)
+            {
+                Edge edge = edgeSet[index, i];
+
+                if (edge != null)
+                    resList.Add(edge);
+            }
+            
+            return resList;
+        }
+
         // Get min of unvisited edges
         private Edge getMinEdge(Vertex v)
         {
             int minDist = -1;
             Edge minEdge = null;
-            int index = FindVertexIndex(v.data);
 
-            foreach (Edge edge in v.dist)
+            List<Edge> currentVertexEdges = FindEdgesListByVertex(v);
+
+            foreach (Edge edge in currentVertexEdges)
             {
                 if (!edge.isVisited)
                 {
@@ -358,7 +376,9 @@ namespace GraphCollections
         {
             int minDist = -1;
             Vertex minVertex = null;
-            foreach (Edge edge in v.dist)
+            List<Edge> currentVertexEdges = FindEdgesListByVertex(v);
+
+            foreach (Edge edge in currentVertexEdges)
             {
                 if (!edge.to.isVisited)
                 {
@@ -406,6 +426,7 @@ namespace GraphCollections
         public int MinLength(string str1, string str2)
         {
             List<Vertex> filledList = GetAllVertices();
+
             foreach (Vertex v in filledList)
             {
                 v.init();
